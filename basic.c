@@ -80,7 +80,7 @@ StringBuilder sb_clone(StringBuilder* sb)
     	return clone; 
 }
 
-StringView sv_new(char* str, size_t len)
+StringView sv_from_parts(char* str, size_t len)
 {
     return (StringView){.length=len, .data=str};
 }
@@ -154,13 +154,13 @@ StringView sv_chop_delim(StringView* sv, char delim)
 StringView sv_chop_str(StringView* sv, char* str)
 {
     size_t n = strlen(str);
-    StringView pat = sv_new(str, n);
-    StringView result = sv_new(sv->data, 0);
+    StringView pat = sv_from_parts(str, n);
+    StringView result = sv_from_parts(sv->data, 0);
 
     size_t i = 0;
     for (i=0; i<sv->length-n; i++)
     {
-	StringView target = sv_new(&(sv->data[i]), n);
+	StringView target = sv_from_parts(&(sv->data[i]), n);
 	if (sv_equal(pat, target)) break;
     }
 

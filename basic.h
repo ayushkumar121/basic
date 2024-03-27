@@ -42,7 +42,7 @@ typedef struct {
 #define SV_Fmt "%.*s"
 #define SV_Arg(sv) (int) (sv).length, (sv).data
 
-StringView sv_new(char* str, size_t len);
+StringView sv_from_parts(char* str, size_t len);
 StringView sv_from_cstr(char* str);
 StringView sv_from_sb(StringBuilder* sb);
 bool sv_equal(StringView s1, StringView s2);

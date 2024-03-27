@@ -50,7 +50,7 @@ int main()
 
     printf("\nString Builder Test:\n");
 
-    StringBuilder sb = {};
+    StringBuilder sb = {0};
     sb_push(&sb, "Hello");
     sb_push(&sb, 45);
     sb_push(&sb, "World");
