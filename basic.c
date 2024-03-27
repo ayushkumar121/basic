@@ -1,11 +1,5 @@
 #include "./basic.h"
 
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-#include <ctype.h>
-#include <stdio.h>
-
 void sb_resize(StringBuilder* sb, size_t new_capacity)
 {
     	// Adding plus 1 for null character
@@ -86,6 +80,11 @@ StringBuilder sb_clone(StringBuilder* sb)
     	return clone; 
 }
 
+StringView sv_new(char* str, size_t len)
+{
+    return (StringView){.length=len, .data=str};
+}
+
 StringView sv_from_cstr(char* str)
 {
 	StringView sv = {0}; 
@@ -100,6 +99,19 @@ StringView sv_from_sb(StringBuilder *sb)
 	sv.data = sb->data;
 	sv.length = sb->length;
     	return sv;
+}
+
+bool sv_equal(StringView s1, StringView s2)
+{
+    if (s1.length != s2.length) return false;
+
+    for (size_t i=0; i<s1.length; i++)
+    {
+        if (s1.data[i] != s2.data[i])
+            return false;
+    }
+
+    return true;
 }
 
 void sv_trim_left(StringView *sv)
@@ -141,11 +153,21 @@ StringView sv_chop_delim(StringView* sv, char delim)
 
 StringView sv_chop_str(StringView* sv, char* str)
 {
-	size_t n = strlen(n);
-    	size_t i = 0;
-    	while (i < sv->length)
-    	{
-        	
-        	i++;
-    	}
+    size_t n = strlen(str);
+    StringView pat = sv_new(str, n);
+    StringView result = sv_new(sv->data, 0);
+
+    size_t i = 0;
+    for (i=0; i<sv->length-n; i++)
+    {
+	StringView target = sv_new(&(sv->data[i]), n);
+	if (sv_equal(pat, target)) break;
+    }
+
+    result.length = i;
+
+    sv->data = sv->data+i+n;
+    sv->length = sv->length-i-n;
+    
+    return result;
 }

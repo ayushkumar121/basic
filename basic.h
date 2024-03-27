@@ -4,6 +4,12 @@
 #include <stddef.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <math.h>
+#include <string.h>
+#include <ctype.h>
 
 typedef struct {
     size_t length;
@@ -36,11 +42,13 @@ typedef struct {
 #define SV_Fmt "%.*s"
 #define SV_Arg(sv) (int) (sv).length, (sv).data
 
+StringView sv_new(char* str, size_t len);
 StringView sv_from_cstr(char* str);
-StringView sv_from_sb(StringBuilder *sb);
-void sv_trim_left(StringView *sv);
-void sv_trim_right(StringView *sv);
-void sv_trim(StringView *sv);
+StringView sv_from_sb(StringBuilder* sb);
+bool sv_equal(StringView s1, StringView s2);
+void sv_trim_left(StringView* sv);
+void sv_trim_right(StringView* sv);
+void sv_trim(StringView* sv);
 StringView sv_chop_delim(StringView* sv, char delim);
 StringView sv_chop_str(StringView* sv, char* str);
 
