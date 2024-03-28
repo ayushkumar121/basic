@@ -46,9 +46,9 @@ StringView sv_from_parts(char* str, size_t len);
 StringView sv_from_cstr(char* str);
 StringView sv_from_sb(StringBuilder* sb);
 bool sv_equal(StringView s1, StringView s2);
-void sv_trim_left(StringView* sv);
-void sv_trim_right(StringView* sv);
-void sv_trim(StringView* sv);
+StringView sv_trim_left(StringView sv);
+StringView sv_trim_right(StringView sv);
+StringView sv_trim(StringView sv);
 StringView sv_chop_delim(StringView* sv, char delim);
 StringView sv_chop_str(StringView* sv, char* str);
 

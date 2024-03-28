@@ -37,8 +37,8 @@ int main()
     {
 	StringView header_key = sv_chop_delim(&header_line, ':');
 
-	sv_trim(&header_key);
-	sv_trim(&header_line);
+	header_key = sv_trim(header_key);
+	header_line = sv_trim(header_line);
 
         printf("Header Key:%.*s\n", SV_Arg(header_key));
         printf("Header Value:%.*s\n", SV_Arg(header_line));

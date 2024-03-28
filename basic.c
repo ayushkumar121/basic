@@ -114,41 +114,46 @@ bool sv_equal(StringView s1, StringView s2)
     return true;
 }
 
-void sv_trim_left(StringView *sv)
+StringView sv_trim_left(StringView sv)
 {
-    	while (isspace(*sv->data))
-        {
-        	sv->data++;
-        	sv->length--;
-        }
+    StringView result = sv;
+    while (isspace(*result.data)) {
+        result.data++;
+        result.length--;
+    }
+    return result; 
 }
 
-void sv_trim_right(StringView* sv)
+StringView sv_trim_right(StringView sv)
 {
-    	while(isspace(sv->data[sv->length-1]))
-        	sv->length--;
+    StringView result = sv;
+    while(isspace(result.data[result.length-1]))
+        result.length--;
+    return result;
 }
 
-void sv_trim(StringView *sv)
+StringView sv_trim(StringView sv)
 {
-    sv_trim_left(sv);
-    sv_trim_right(sv);
+    StringView result = sv_trim_left(sv);
+    result = sv_trim_right(sv);
+
+    return result;
 }
 
 StringView sv_chop_delim(StringView* sv, char delim)
 {
-    	size_t i = 0;
-    	while (sv->data[i] != delim && i < sv->length)
-        	i++;
+    size_t i = 0;
+    while (sv->data[i] != delim && i < sv->length)
+        i++;
 
-    	StringView result = {0};
-	result.data = sv->data;
-	result.length = i;
-	
-    	sv->data = sv->data+i+1;
-    	sv->length = sv->length-i;
+    StringView result = {0};
+    result.data = sv->data;
+    result.length = i;
 
-	return result;
+    sv->data = sv->data+i+1;
+    sv->length = sv->length-i;
+
+    return result;
 }
 
 StringView sv_chop_str(StringView* sv, char* str)
@@ -158,10 +163,9 @@ StringView sv_chop_str(StringView* sv, char* str)
     StringView result = sv_from_parts(sv->data, 0);
 
     size_t i = 0;
-    for (i=0; i<sv->length-n; i++)
-    {
-	StringView target = sv_from_parts(&(sv->data[i]), n);
-	if (sv_equal(pat, target)) break;
+    for (i=0; i<sv->length-n; i++) {
+        StringView target = sv_from_parts(&(sv->data[i]), n);
+        if (sv_equal(pat, target)) break;
     }
 
     result.length = i;
