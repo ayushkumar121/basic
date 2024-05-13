@@ -2,8 +2,10 @@
 
 void sb_resize(StringBuilder *sb, size_t new_capacity) {
   sb->capacity = new_capacity;
-  sb->items = realloc(sb->items, sb->capacity + 1);
+  sb->items = MEM_REALLOC(sb->items, sb->capacity + 1);
 }
+
+void sb_free(StringBuilder *sb) { array_free(sb); }
 
 void sb_push_str(StringBuilder *sb, char *str) {
   size_t item_len = strlen(str);
@@ -61,7 +63,8 @@ void sb_push_double(StringBuilder *sb, double d) {
 
   // Handling fractional part
   int f = (d - i) * 1000000;
-  if (f < 0) f *= -1;
+  if (f < 0)
+    f *= -1;
   sb_push_int(sb, f);
 }
 
