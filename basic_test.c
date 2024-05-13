@@ -2,7 +2,7 @@
 
 #define CRLF "\r\n"
 
-int main()
+int main(void)
 {	
     char* http_res = "" 
     	"HTTP/2 200"CRLF
@@ -52,9 +52,27 @@ int main()
 
     StringBuilder sb = {0};
     sb_push(&sb, "Hello");
-    sb_push(&sb, 45);
-    sb_push(&sb, "World");
-
+    sb_push(&sb, -4.5);
+    sb_push(&sb, "World\n");
 
     printf("String Builder Test:%.*s\n", SV_Arg(sb));
+
+    printf("\nArray Test:\n");
+
+    typedef struct {
+        size_t length;
+        size_t capacity;
+        int* items;
+    } IntArray;
+
+    IntArray arr = {0};
+
+    array_append(&arr, 22);
+    array_append(&arr, 33);
+    array_append(&arr, 44);
+
+    for (size_t i=0; i<arr.length; i++) {
+        printf("%d\n", arr.items[i]);
+    }
+
 }

@@ -1,7 +1,7 @@
-CC=gcc
-CFLAGS=-Wall -Wextra -Wpedantic
+CC=clang
+CFLAGS=-Wall -Werror -Wextra -Wpedantic -g
 LIBS=-lm
 
 .PHONY: build
-build:
-	$(CC) basic_test.c basic.c -o basic_test $(CFLAGS) $(LIBS)
+basic_test: basic.c basic_test.c
+	$(CC) -o basic_test basic_test.c basic.c $(CFLAGS) $(LIBS)
