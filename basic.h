@@ -11,6 +11,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct {
+  char* message;
+} Error;
+
+#define NullError (Error){0};
+
+Error error(char* message);
+bool has_error(Error err);
+
 #define MEM_REALLOC realloc
 #define MEM_FREE(ptr, size) free(ptr)
 
@@ -71,5 +80,27 @@ StringView sv_trim(StringView sv);
 StringView sv_chop_delim(StringView *sv, char delim);
 StringView sv_chop_str(StringView *sv, char *str);
 
-#endif // BASIC_H
+typedef struct {
+  void *key;
+  void *value;
+} TableEntry;
 
+typedef bool (*KeyEqFunc) (void*, void*);
+typedef size_t (*KeyHashFunc) (void*, void*);
+
+typedef struct {
+  TableEntry* entries;
+  size_t length;
+  size_t capacity;
+
+  KeyEqFunc key_eq;
+  KeyHashFunc key_hash;
+} HashTable;
+
+HashTable hash_table_init(size_t capacity, KeyEqFunc key_eq, KeyHashFunc key_hash);
+Error hash_table_insert(HashTable* v, void* key, void* val);
+Error hash_table_get(HashTable* v, void* key, void** out);
+Error hash_table_remove(HashTable* v, void* key, void** out);
+void hash_table_free(HashTable* v);
+
+#endif // BASIC_H

@@ -2,6 +2,20 @@
 
 #define CRLF "\r\n"
 
+bool int_key_eq(void* a, void* b) {
+  int* key1=a;
+  int* key2=b;
+
+  return *key1 == *key2;
+}
+
+size_t int_key_hash(void* a, void *b) {
+  HashTable* table = a;
+  int* key = b;
+
+  return (*key)%table->capacity;
+}
+
 int main(void) {
   char *http_res =
       ""
@@ -69,5 +83,42 @@ int main(void) {
   for (size_t i = 0; i < arr.length; i++) {
     printf("%d\n", arr.items[i]);
   }
+
+  printf("\nHashTable Test:\n");
+  HashTable table = hash_table_init(10, int_key_eq, int_key_hash);
+
+  int x = 1, y = 2, z = 3;
+
+  hash_table_insert(&table, &x, "X");
+  hash_table_insert(&table, &y, "Y");
+  hash_table_insert(&table, &z, "Z");
+
+  for (size_t i = 0; i < table.capacity; ++i) {
+    TableEntry entry = table.entries[i];
+    if (entry.key != NULL) {
+      printf("\t%d => %s\n", *(int*)entry.key, (char*)entry.value);
+    } else {
+      printf("\t___\n");  
+    }
+  }
+
+  Error err = NullError;
+
+  err = hash_table_get(&table, &x, NULL);
+  if (!has_error(err)) {
+    printf("Found x\n");
+  }
+
+  err = hash_table_get(&table, &y, NULL);
+  if (!has_error(err)) {
+    printf("Found y\n");
+  }
+  
+  err = hash_table_get(&table, &z, NULL);
+  if (!has_error(err)) {
+    printf("Found z\n");
+  }
+
+
   array_free(&arr);
 }

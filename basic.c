@@ -1,5 +1,17 @@
 #include "./basic.h"
 
+/* Error Handling */
+
+Error error(char* message) {
+  return (Error){.message = message};
+}
+
+bool has_error(Error err) {
+  return err.message != NULL;
+}
+
+/* String Builder */
+
 void sb_resize(StringBuilder *sb, size_t new_capacity) {
   sb->capacity = new_capacity;
   sb->items = MEM_REALLOC(sb->items, sb->capacity + 1);
@@ -73,6 +85,8 @@ StringBuilder sb_clone(StringBuilder *sb) {
   sb_push_str(&clone, sb->items);
   return clone;
 }
+
+/* String View */
 
 StringView sv_from_parts(char *str, size_t len) {
   return (StringView){.length = len, .items = str};
@@ -160,4 +174,120 @@ StringView sv_chop_str(StringView *sv, char *str) {
   sv->length = sv->length - i - n;
 
   return result;
+}
+
+/* Hash Table */
+
+HashTable hash_table_init(size_t capacity, KeyEqFunc key_eq, KeyHashFunc key_hash) {
+  assert(key_eq != NULL && "key_eq is required");
+  assert(key_hash != NULL && "key_hash is required");
+
+  HashTable v = {0};
+  
+  size_t sz = capacity*sizeof(TableEntry);
+  v.entries = (TableEntry*)MEM_REALLOC(NULL, sz);
+  v.capacity = capacity;
+  v.key_eq = key_eq;
+  v.key_hash = key_hash;
+
+  memset(v.entries, 0, sz);
+  return v;
+}
+
+Error hash_table_insert(HashTable* v, void* key, void* val) {
+  assert(v != NULL && "map cannot be null");
+
+  if (key == NULL) return error("key is null");  
+  if (val == NULL) return error("value is null");
+  if (v->entries == NULL) return error("uninitialized map");
+
+  size_t index = v->key_hash(v, key);
+  bool index_found = false;
+
+  for (size_t i = 0; i < v->capacity; ++i) {
+    size_t try_index = (i+index)%v->capacity;
+    TableEntry entry = v->entries[try_index];
+
+    if (entry.key == NULL || v->key_eq(entry.key, key)) {
+      index = try_index;
+      index_found = true;
+      break;
+    }
+  }
+  if (!index_found) return error("map is full");
+
+  v->entries[index].key = key;
+  v->entries[index].value = val;
+  v->length++;
+
+  return NullError;
+}
+
+Error hash_table_get(HashTable* v, void* key, void** out) {
+  assert(v != NULL && "map is null");
+
+  if (key == NULL) return error("key is null");
+  if (v->entries == NULL) return error("uninitialized map");
+
+  size_t index = v->key_hash(v, key);
+  bool index_found = false;
+
+  for (size_t i = 0; i < v->capacity; ++i) {
+    size_t try_index = (i+index)%v->capacity;
+    TableEntry entry = v->entries[try_index];
+
+    if (entry.key != NULL && v->key_eq(entry.key, key)) {
+      index = try_index;
+      index_found = true;
+      break;
+    }
+  }
+  if (!index_found) return error("key not found");
+  if (out != NULL) {
+    *out = v->entries[index].value;
+  }
+  
+  return NullError;
+}
+
+Error hash_table_remove(HashTable* v, void* key, void** out) {
+  assert(v != NULL && "map is null");
+
+  if (key == NULL) return error("key is null");
+  if (v->entries == NULL) return error("uninitialized map");
+
+  size_t index = v->key_hash(v, key);
+  bool index_found = false;
+
+  for (size_t i = 0; i < v->capacity; ++i) {
+    size_t try_index = (i+index)%v->capacity;
+    TableEntry entry = v->entries[try_index];
+
+  if (entry.key != NULL && v->key_eq(entry.key, key)) {
+      index = try_index;
+      index_found = true;
+      break;
+    }
+  }
+  if (!index_found) return error("key not found");
+
+  if (out != NULL) {
+    *out = v->entries[index].value;
+  }
+
+  v->entries[index].key = NULL;
+  v->entries[index].value = NULL;
+  v->length--;
+
+  return NullError;
+}
+
+void hash_table_free(HashTable* v) {
+  assert(v != NULL && "map is null");
+
+  if (v->entries) {
+    MEM_FREE(v->entries, v->capacity*sizeof(TableEntry));
+    v->entries = NULL;
+    v->capacity = 0;
+  }
 }
